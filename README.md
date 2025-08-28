@@ -1,2 +1,1 @@
-# EcoSwap
 # EcoSwap-web
