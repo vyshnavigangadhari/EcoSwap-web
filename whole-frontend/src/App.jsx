@@ -11,8 +11,18 @@ import NotFound from './pages/NotFound.jsx'
 import { ItemsProvider } from './context/ItemsContext.jsx'
 import { ToastProvider } from './components/Toast.jsx'
 
+import { useEffect,useState } from 'react'
 
 export default function App(){
+    const [ping, setPing] = useState('');
+    useEffect(() => {
+        fetch('http://localhost:5000/api/items')  // Adjust the URL as needed
+            .then(response => response.json())
+            .then(data => setPing(data.message))
+            .catch(error => console.error('Error fetching ping:', error));
+    }, []);
+
+    console.log(ping);  // Should log 'pong' if the backend is working correctly    
 return (
 <ToastProvider>
 <ItemsProvider>
