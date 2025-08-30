@@ -1,33 +1,27 @@
+// backend/models/Item.js
 import mongoose from "mongoose";
 
-const itemSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
+const itemSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true },
+    description: String,
+    imageUrl: String,
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    status: {
+      type: String,
+      enum: ["AVAILABLE", "PENDING", "SWAPPED"],
+      default: "AVAILABLE",
     },
-    description: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    price: {
-        type: Number,
-        required: true,
-        min: 0
-    },
-    category: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
+    swapRequests: [
+      {
+        requesterName: String,
+        offeredItemId: { type: mongoose.Schema.Types.ObjectId, ref: "Item" },
+        message: String,
+        status: { type: String, default: "PENDING" }
+      }
+    ]
+  },
+  { timestamps: true }
+);
 
-// Instead of class, we just export the function returning model
-const Item = mongoose.model("Item", itemSchema);
-
-export default Item;
+export default mongoose.model("Item", itemSchema);
