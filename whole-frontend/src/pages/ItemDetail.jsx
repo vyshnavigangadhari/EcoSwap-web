@@ -10,6 +10,7 @@ export default function ItemDetail() {
   const [swapForm, setSwapForm] = useState({ requesterName:"", offeredItemId:"", message:"" });
   const [swapMsg, setSwapMsg] = useState("");
   const [swapErr, setSwapErr] = useState("");
+  const [coins, setCoins] = useState(100); // default
 
   const load = async () => {
     setLoading(true);
@@ -26,7 +27,8 @@ export default function ItemDetail() {
         offeredItemId: swapForm.offeredItemId || undefined,
         message: swapForm.message
       });
-      setSwapMsg("Swap request sent! 🎉");
+      setSwapMsg("Swap request sent! 🎉 You earned 100 coins.");
+      setCoins(c => c + 100);
       setSwapOpen(false);
       setSwapForm({ requesterName:"", offeredItemId:"", message:"" });
       await load();
@@ -41,11 +43,13 @@ export default function ItemDetail() {
       {item.imageUrl ? <img src={item.imageUrl} alt={item.title} /> : null}
       <h2 style={{ marginTop: 14 }}>{item.title}</h2>
       <p className="muted">
-        Owner: <b>{item.owner}</b> • Status:{" "}
+        Owner: <b>{item.owner?.name}</b> ({item.owner?.email}) • Status:{" "}
         <span className={`badge ${item.status}`}>{item.status}</span>
       </p>
       <div className="spacer" />
       <p style={{ color:"#334155" }}>{item.description}</p>
+
+      <p className="mt-3">💰 Your coins: <b>{coins}</b></p>
 
       <div className="section">
         <button className="btn btn-primary" onClick={() => setSwapOpen(v => !v)}>
@@ -89,4 +93,3 @@ export default function ItemDetail() {
     </div>
   );
 }
-

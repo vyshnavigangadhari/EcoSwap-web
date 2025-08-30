@@ -1,47 +1,76 @@
-import { Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navbar.jsx'
-import Footer from './components/Footer.jsx'
-import Home from './pages/Home.jsx'
-import ItemDetails from './pages/ItemDetails.jsx'
-import AddItem from './pages/AddItem.jsx'
-import Dashboard from './pages/Dashboard.jsx'
-import Profile from './pages/Profile.jsx'
-import About from './pages/About.jsx'
-import NotFound from './pages/NotFound.jsx'
-import { ItemsProvider } from './context/ItemsContext.jsx'
-import { ToastProvider } from './components/Toast.jsx'
+// src/App.jsx
+import { Routes, Route, Navigate } from "react-router-dom";
+import Navbar from "./components/Navbar.jsx";
+import Footer from "./components/Footer.jsx";
+import Home from "./pages/Home.jsx";
+import ItemDetails from "./pages/ItemDetails.jsx";
+import AddItem from "./pages/AddItem.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Profile from "./pages/Profile.jsx";
+import About from "./pages/About.jsx";
+import NotFound from "./pages/NotFound.jsx";
+import { ItemsProvider } from "./context/ItemsContext.jsx";
+import { ToastProvider } from "./components/Toast.jsx";
+import { AuthProvider, AuthContext } from "./context/AuthContext.jsx"; // NEW
+import { useContext } from "react";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
 
-import { useEffect,useState } from 'react'
+function PrivateRoute({ children }) {
+  const { user } = useContext(AuthContext);
+  return user ? children : <Navigate to="/login" />;
+}
 
-export default function App(){
-    const [ping, setPing] = useState('');
-    useEffect(() => {
-        fetch('http://localhost:5000/api/items')  // Adjust the URL as needed
-            .then(response => response.json())
-            .then(data => setPing(data.message))
-            .catch(error => console.error('Error fetching ping:', error));
-    }, []);
+export default function App() {
+  return (
+    <ToastProvider>
+      <ItemsProvider>
+        <AuthProvider>
+          <div className="app">
+            <Navbar />
+            <main className="container">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/items/:id" element={<ItemDetails />} />
 
-    console.log(ping);  // Should log 'pong' if the backend is working correctly    
-return (
-<ToastProvider>
-<ItemsProvider>
-<div className="app">
-<Navbar />
-<main className="container">
-<Routes>
-<Route path="/" element={<Home />} />
-<Route path="/items/:id" element={<ItemDetails />} />
-<Route path="/add" element={<AddItem />} />
-<Route path="/dashboard" element={<Dashboard />} />
-<Route path="/profile" element={<Profile />} />
-<Route path="/about" element={<About />} />
-<Route path="*" element={<NotFound />} />
-</Routes>
-</main>
-<Footer />
-</div>
-</ItemsProvider>
-</ToastProvider>
-)
+                {/* Auth routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+
+                {/* Protected routes */}
+                <Route
+                  path="/add"
+                  element={
+                    <PrivateRoute>
+                      <AddItem />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <PrivateRoute>
+                      <Dashboard />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <PrivateRoute>
+                      <Profile />
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route path="/about" element={<About />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </AuthProvider>
+      </ItemsProvider>
+    </ToastProvider>
+  );
 }
