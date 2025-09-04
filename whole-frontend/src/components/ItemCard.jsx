@@ -1,36 +1,29 @@
 import { Link } from "react-router-dom";
-import StatusBadge from "./StatusBadge.jsx";
 
-export default function ItemCard({ item }) {
+export default function ItemCard({ item, onDelete }) {
   return (
-    <article className="card">
-      {/* Optional Image */}
-      {item.imageUrl && (
-        <img
-          src={item.imageUrl}
-          alt={item.title}
-          className="h-40 w-full object-cover rounded"
-        />
-      )}
+    <div className="card">
+      <h2>{item.title}</h2>
+      <p>Owner: {item.owner}</p>
+      <p>Status: {item.status}</p>
 
-      {/* Title */}
-      <h3>{item.title || "Untitled Item"}</h3>
-
-      {/* Owner + Status */}
-      <p className="muted">
-        Owner: <strong>{item.owner?.name || "Unknown"}</strong> • Status:{" "}
-        <StatusBadge status={item.status || "available"} />
-      </p>
-
-      {/* Description */}
-      <p>{item.description || "No description provided"}</p>
-
-      {/* Actions */}
       <div className="card-actions">
-        <Link className="btn" to={`/items/${item._id}`}>
-          View details 
+        <Link to={`/items/${item._id}`}>
+          <button className="btn">View Details</button>
         </Link>
+
+        {/* Delete button */}
+        <button
+          className="btn ghost"
+          onClick={() => {
+            if (window.confirm(`Delete "${item.title}"?`)) {
+              onDelete(item._id);
+            }
+          }}
+        >
+          Delete
+        </button>
       </div>
-    </article>
+    </div>
   );
 }

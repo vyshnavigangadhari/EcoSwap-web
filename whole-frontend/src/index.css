@@ -10,6 +10,31 @@
   --danger:#fecaca;
   --neutral:#b8d7ff;
 }
+/* Progress Bar */
+.progress-container {
+  display: flex;
+  height: 18px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #e5e7eb;
+  margin-top: 10px;
+}
+
+.progress {
+  height: 100%;
+}
+
+.progress.available {
+  background: #4ade80; /* green */
+}
+
+.progress.pending {
+  background: #facc15; /* yellow */
+}
+
+.progress.swapped {
+  background: #60a5fa; /* blue */
+}
 
 *{box-sizing:border-box}
 html,body,#root{height:100%}

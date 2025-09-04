@@ -1,42 +1,94 @@
-import { useParams, Link } from "react-router-dom";
-import { useItems } from "../context/ItemsContext.jsx";
-import StatusBadge from "../components/StatusBadge.jsx";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function ItemDetails() {
   const { id } = useParams();
-  const { items, updateItem } = useItems();
-  const item = items.find((i) => i._id === id); // ✅ use _id
+  const [item, setItem] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name: "", message: "" });
 
-  if (!item) return <p>Item not found.</p>;
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("items")) || [];
+    const found = stored.find((it) => it._id === id);
+    setItem(found);
+  }, [id]);
 
-  const cycle = () => {
-    const order = ["available", "pending", "swapped"]; // ✅ lowercase
-    const next = order[(order.indexOf(item.status) + 1) % order.length];
-    updateItem(item._id, { status: next }); // ✅ use _id
+  const handleRequest = (e) => {
+    e.preventDefault();
+
+    const newRequest = {
+      requestId: Date.now().toString(),
+      itemId: item._id,
+      itemTitle: item.title,
+      fromUser: form.name,
+      toUser: item.owner,
+      message: form.message || "",
+      status: "PENDING",
+      createdAt: new Date().toISOString(),
+    };
+
+    // Save request
+    const storedRequests = JSON.parse(localStorage.getItem("requests")) || [];
+    const updatedRequests = [...storedRequests, newRequest];
+    localStorage.setItem("requests", JSON.stringify(updatedRequests));
+
+    // 🔥 Update item’s status → PENDING
+    const storedItems = JSON.parse(localStorage.getItem("items")) || [];
+    const updatedItems = storedItems.map((it) =>
+      it._id === item._id ? { ...it, status: "PENDING" } : it
+    );
+    localStorage.setItem("items", JSON.stringify(updatedItems));
+
+    alert("Swap request sent!");
+    setForm({ name: "", message: "" });
+    setShowForm(false);
   };
 
+  if (!item) return <p>Item not found</p>;
+
   return (
-    <section className="stack-lg">
-      <Link className="link" to="/">
-        <button className="btn">Back</button>
-      </Link>
-      <h1>{item.title}</h1>
+    <div className="details-page">
+      <div className="details-card">
+        <h1>{item.title}</h1>
+        <p>{item.description}</p>
+        <p className="muted">Owner: {item.owner}</p>
+        <p className="muted">Status: {item.status}</p>
 
-      <p className="muted">
-        Owner:{" "}
-        <strong>{item.owner?.name || "Unknown"}</strong>{" "}
-        ({item.owner?.email || "No email"}) • Status:{" "}
-        <StatusBadge status={item.status} />
-      </p>
+        {item.status === "AVAILABLE" && (
+          <>
+            <button className="btn" onClick={() => setShowForm(!showForm)}>
+              Request Swap
+            </button>
 
-      <p>{item.description}</p>
-
-      <div className="row gap">
-        <button className="btn" onClick={cycle}>
-          Change status
-        </button>
-        <button className="btn ghost">Start swap chat</button>
+            {showForm && (
+              <form onSubmit={handleRequest} className="form">
+                <label>
+                  Your Name
+                  <input
+                    value={form.name}
+                    onChange={(e) =>
+                      setForm({ ...form, name: e.target.value })
+                    }
+                    required
+                  />
+                </label>
+                <label>
+                  Message
+                  <textarea
+                    value={form.message}
+                    onChange={(e) =>
+                      setForm({ ...form, message: e.target.value })
+                    }
+                  />
+                </label>
+                <button type="submit" className="btn">
+                  Send Request
+                </button>
+              </form>
+            )}
+          </>
+        )}
       </div>
-    </section>
+    </div>
   );
 }

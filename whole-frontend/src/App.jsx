@@ -11,10 +11,12 @@ import About from "./pages/About.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import { ItemsProvider } from "./context/ItemsContext.jsx";
 import { ToastProvider } from "./components/Toast.jsx";
-import { AuthProvider, AuthContext } from "./context/AuthContext.jsx"; // NEW
+import { AuthProvider, AuthContext } from "./context/AuthContext.jsx";
 import { useContext } from "react";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import SwapRequests from "./pages/SwapRequests.jsx";
+import MyRequests from "./pages/MyRequests.jsx"; // ✅ new page
 
 function PrivateRoute({ children }) {
   const { user } = useContext(AuthContext);
@@ -30,8 +32,11 @@ export default function App() {
             <Navbar />
             <main className="container">
               <Routes>
+                {/* Public pages */}
                 <Route path="/" element={<Home />} />
                 <Route path="/items/:id" element={<ItemDetails />} />
+                <Route path="/about" element={<About />} />
+                <Route path="*" element={<NotFound />} />
 
                 {/* Auth routes */}
                 <Route path="/login" element={<Login />} />
@@ -63,8 +68,15 @@ export default function App() {
                   }
                 />
 
-                <Route path="/about" element={<About />} />
-                <Route path="*" element={<NotFound />} />
+                {/* Swap system */}
+                <Route
+                  path="/swap-requests"
+                  element={<SwapRequests />} // 🔓 Public for now
+                />
+                <Route
+                  path="/my-requests"
+                  element={<MyRequests />} // 🔓 Public for now
+                />
               </Routes>
             </main>
             <Footer />
