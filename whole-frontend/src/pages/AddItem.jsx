@@ -4,12 +4,24 @@ export default function AddItem() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    imageUrl: "",
+    image: "", // store base64 instead of URL
     owner: "",
   });
 
   const onChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Handle file upload -> convert to Base64
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setForm((prev) => ({ ...prev, image: reader.result }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = (e) => {
@@ -19,7 +31,7 @@ export default function AddItem() {
       _id: Date.now().toString(),
       title: form.title,
       description: form.description || "No description provided",
-      imageUrl: form.imageUrl,
+      image: form.image, // ✅ stored as base64
       owner: form.owner || "Unknown",
       status: "AVAILABLE",
       createdAt: new Date().toISOString(),
@@ -30,7 +42,7 @@ export default function AddItem() {
     localStorage.setItem("items", JSON.stringify(updatedItems));
 
     alert("Item added successfully!");
-    setForm({ title: "", description: "", imageUrl: "", owner: "" });
+    setForm({ title: "", description: "", image: "", owner: "" });
   };
 
   return (
@@ -61,14 +73,27 @@ export default function AddItem() {
           </label>
 
           <label>
-            Image URL (optional)
+            Upload Image *
             <input
-              name="imageUrl"
-              value={form.imageUrl}
-              onChange={onChange}
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
               className="input"
+              required
             />
           </label>
+
+          {/* Show preview if an image is selected */}
+          {form.image && (
+            <div className="preview">
+              <p>Preview:</p>
+              <img
+                src={form.image}
+                alt="Preview"
+                style={{ width: "120px", height: "120px", objectFit: "cover" }}
+              />
+            </div>
+          )}
 
           <label>
             Owner *
