@@ -19,9 +19,9 @@ export default function Profile() {
 
       {/* Profile card */}
       <div className="profile-card">
-        <h3>{user.name}</h3>
-        <p>{user.email}</p>
-        <p>Role: {user.role}</p>
+        <h3>{user.name || "Unknown User"}</h3>
+        <p>{user.email || "No email available"}</p>
+        <p>Role: {user.role || "Not assigned"}</p>
       </div>
     </section>
   );

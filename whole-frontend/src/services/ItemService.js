@@ -1,67 +1,59 @@
 // src/services/itemService.js
-const API_URL = "http://localhost:5000/api/items";
 
-export async function getItems(token) {
-  const res = await fetch(API_URL, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Failed to fetch items");
-  return await res.json();
+// Get all items from localStorage
+export async function getItems() {
+  const items = JSON.parse(localStorage.getItem("items")) || [];
+  return items;
 }
 
-export async function getItemById(id, token) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Item not found");
-  return await res.json();
+// Get single item by id
+export async function getItemById(id) {
+  const items = JSON.parse(localStorage.getItem("items")) || [];
+  const found = items.find((it) => String(it._id) === String(id));
+  console.log("getItemById returning:", found); // 👀 Debug log
+  return found || null;
 }
 
-export async function createItem(payload, token) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) throw new Error("Failed to create item");
-  return await res.json();
+// Create new item
+export async function createItem(payload) {
+  const items = JSON.parse(localStorage.getItem("items")) || [];
+  items.push(payload);
+  localStorage.setItem("items", JSON.stringify(items));
+  return payload;
 }
 
-export async function updateItem(id, updates, token) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(updates),
-  });
-  if (!res.ok) throw new Error("Failed to update item");
-  return await res.json();
+// Update item
+export async function updateItem(id, updates) {
+  let items = JSON.parse(localStorage.getItem("items")) || [];
+  items = items.map((it) => (String(it._id) === String(id) ? { ...it, ...updates } : it));
+  localStorage.setItem("items", JSON.stringify(items));
+  return items.find((it) => String(it._id) === String(id));
 }
 
-export async function deleteItem(id, token) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Failed to delete item");
+// Delete item
+export async function deleteItem(id) {
+  let items = JSON.parse(localStorage.getItem("items")) || [];
+  items = items.filter((it) => String(it._id) !== String(id));
+  localStorage.setItem("items", JSON.stringify(items));
   return { ok: true };
 }
 
-// For swap requests
-export async function requestSwap(id, payload, token) {
-  const res = await fetch(`${API_URL}/${id}/swap`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
+// Handle swap requests
+export async function requestSwap(id, payload) {
+  let items = JSON.parse(localStorage.getItem("items")) || [];
+  items = items.map((it) => {
+    if (String(it._id) === String(id)) {
+      const swapRequests = it.swapRequests || [];
+      return {
+        ...it,
+        swapRequests: [
+          ...swapRequests,
+          { ...payload, _id: Date.now().toString(), status: "PENDING" },
+        ],
+      };
+    }
+    return it;
   });
-  if (!res.ok) throw new Error("Swap request failed");
-  return await res.json();
+  localStorage.setItem("items", JSON.stringify(items));
+  return items.find((it) => String(it._id) === String(id));
 }

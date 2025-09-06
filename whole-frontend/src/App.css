@@ -1,3 +1,4 @@
+/* Root container */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -5,6 +6,7 @@
   text-align: center;
 }
 
+/* Logo styling */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -33,10 +35,49 @@
   }
 }
 
-.card {
-  padding: 2em;
-}
-
+/* Docs helper */
 .read-the-docs {
   color: #888;
+}
+
+/* Card styling */
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ✅ Home page card images (uniform size but smaller) */
+.item-image {
+  width: 80%;            /* shrink image inside card */
+  height: 160px;         /* smaller height */
+  object-fit: cover;     /* keep alignment, crop if needed */
+  border-radius: 6px;
+  display: block;
+  margin: 0 auto 10px;   /* center horizontally */
+}
+
+/* Card action buttons */
+.card-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* ✅ Detail page image (full item, no cropping) */
+.item-detail-image {
+  max-width: 300px;      /* smaller max size */
+  max-height: 300px;
+  width: 100%;
+  object-fit: contain;   /* show full image */
+  margin: 0 auto 16px auto;
+  border-radius: 10px;
+  display: block;
+  background: #f9f9f9;   /* light frame */
+  padding: 8px;
 }
