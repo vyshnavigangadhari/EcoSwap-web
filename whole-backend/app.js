@@ -23,7 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/items", itemsRoutes);
 app.use("/api/users", usersRoutes);
 
-// Start the server
+// Start the server in the 5000 port number;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
